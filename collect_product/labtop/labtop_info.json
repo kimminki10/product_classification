@@ -1,0 +1,59 @@
+{
+    "name": "레노버 LEGION 5 Pro 16ARH R7 3070Ti W11 64GB램",
+    "OS": "윈도우11홈",
+    "purpose": ["게임용", "그래픽작업용"],
+    "display": {
+        "size": "40.6",
+        "resolution": "2560x1600",
+        "color_gamut": {"sRGB":"100"},
+        "brightness": "500nit",
+        "refresh_rate": "165Hz",
+        "panel_type": "IPS",
+        "other_character": ["광시야각", "눈부심방지", "슬림형 베젤", "돌비비전"]
+    },
+    "CPU": {
+        "generation": "라이젠7-5세대",
+        "code_name": "램브란트",
+        "name": "6800H",
+        "base_clock": "3.2GHz",
+        "cores": "8",
+        "threads": "16"
+    },
+    "memory": {
+        "DDR": "DDR5",
+        "size": "64GB",
+        "clock": "4800MHz",
+        "replacement": "true"
+    },
+    "storage": {
+        "type": "M.2(NVMe)",
+        "capacity": "512GB",
+        "slot_num": "2"
+    },
+    "graphic_card": {
+        "integrated": "false",
+        "name": "RTX3070 Ti",
+        "TGP": "150W",
+        "VRAM": "8GB"
+    },
+    "video_IO_port": {
+        "info": ["HDMI 2.1", "웹캠(HD)"]
+    },
+    "IO_port": {
+        "USB-C_num": "3",
+        "USB-A_num": "3",
+        "USB_version": ["3.2", "3.0"]
+    },
+    "other_character": ["웹캠OFF 지원", "USB-PD", "DP Alt Mode"],
+    "input_device_character": ["RGB 라이트", "ㅗ형 방향키", "숫자 키패드(4열)"],
+    "power": {
+        "battery_capacity": "80Wh", 
+        "charging_port": "dedicated"
+    },
+    "specification": {
+        "thickness": "19.9mm",
+        "weight": "2.49kg",
+        "color": "grey",
+        "pan_num": "2"
+    }
+}
