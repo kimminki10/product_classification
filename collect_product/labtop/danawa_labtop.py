@@ -1,22 +1,5 @@
-import json
-import time
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
+from search_engine import laptop_search
 
-
-class LaptopSearch():
-    def __init__(self) -> None:
-        options = webdriver.ChromeOptions()
-        options.add_argument('headless')
-        options.add_argument("disable-gpu")
-
-        self.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
-        self.driver.implicitly_wait(2)
-
-    def get_driver(self):
-        return self.driver
 
 def parse_laptop_name(prod_name):
     first_space_idx = prod_name.find(' ')
@@ -54,21 +37,13 @@ def parse_laptop_display_info(line):
         return
     line = line[5:]
     items = line.split(' /')
-    display_size, resolution, color_space, brightness, panel_type = items[:5]
-    other_spec = items[5:]
-
-    color_space_type, percent = color_space.strip().split(':')
+    display_size, resolution = items[:2]
+    other_spec = items[2:]
 
     other_spec = [ i.strip() for i in other_spec if i ]
     display_info = {
         "size": display_size.strip(),
         "resolution": resolution.strip(),
-        "color_space": {
-            "color_space_type": color_space_type.strip(),
-            "percentage": percent.strip()
-        },
-        "brightness": brightness.strip(),
-        "panel_type": panel_type.strip(),
         "other_character": other_spec
     }
     return display_info
@@ -80,14 +55,12 @@ def parse_laptop_cpu_info(line):
         return
     line = line[5:]
     
-    company, generation, code_name, cpu_number, core_num = line.split(' / ')
-    cpu_info = {
-        "company": company.strip(),
-        "generation": generation.strip(),
-        "code_name": code_name.strip(),
-        "cpu_number": cpu_number.strip(),
-        "core_num": core_num.strip(),
-    },
+    items = line.split(' /')
+    keys = ["company", "generation", "code_name", "cpu_number", "core_num"]
+    cpu_info = dict()
+    for i, item in enumerate(items):
+        if item:
+            cpu_info[keys[i]] = item.strip()
     return cpu_info
 
 
@@ -157,8 +130,10 @@ def parse_laptop_network_info(line):
     network = {}
     for i in items:
         if i:
-            t, spec = i.split(':')
-            network[t.strip()] = spec.strip()
+            cur = i.split(':')
+            if cur[0] in ["무선랜", "유선랜"] and len(cur) == 2:
+                t, spec = cur
+                network[t.strip()] = spec.strip()
     return network
 
 
@@ -246,32 +221,71 @@ def parse_laptop_specification(line):
     return specification
 
 
-def parse_laptop_price(line):
+def parse_laptop_price(price_list):
     """
-    ex>1,339,000원 가격정보 더보기
+    ex>'13몰', '2,999,000원 가격정보 더보기', 'SSD 512GB'
     """
-    return line[:-10].replace(',', '')
+    prices = []
+    for i in range(0, len(price_list), 3):
+        line = price_list[i+1]
+        price = line[:-10]
+        price.replace(',', '')
+
+        option = price_list[i+2:]
+        if option == []:
+            option = ''
+        else:
+            option = option[0]
+
+        prices.append({
+            "price": price,
+            "option": option,
+            "market_num": price_list[i],
+        })
+        
+    return prices
 
 
 def parse_laptop_text(product_text):
     laptop = {}
 
     lines = product_text.split('\n')
-    print(lines)
+    if lines[0] == '': return None
+
     manufacturer, name                    = parse_laptop_name(lines[0])
     is2in1, osinfo, spec_changed, purpose = parse_laptop_general_info(lines[1])
-    display_info      = parse_laptop_display_info(lines[2])
-    cpu_info          = parse_laptop_cpu_info(lines[3])
-    memory_info       = parse_laptop_memory_info(lines[4])
-    storage_info      = parse_laptop_storage_info(lines[5])
-    graphic_card_info = parse_laptop_graphic_card_info(lines[6])
-    network_info      = parse_laptop_network_info(lines[7])
-    video_io_info     = parse_laptop_video_io_info(lines[8])
-    io_port_info      = parse_laptop_io_port_info(lines[9])
-    other_character   = parse_laptop_other_character(lines[10])
-    input_device      = parse_laptop_input_device(lines[11])
-    power_info        = parse_laptop_power_info(lines[12])
-    price             = parse_laptop_price(lines[16])
+    if is2in1 == "중고": return None
+
+
+    display_info = ''
+    cpu_info = ''
+    memory_info = ''
+    storage_info = ''
+    graphic_card_info = ''
+    network_info = ''
+    video_io_info = ''
+    io_port_info = ''
+    other_character = ''
+    input_device = ''
+    power_info = ''
+
+    for i in range(2, 13):
+        if   "화면정보" == lines[i][:4]: display_info = parse_laptop_display_info(lines[i])
+        elif "프로세서" == lines[i][:4]: cpu_info     = parse_laptop_cpu_info(lines[i])
+        elif "메모리"   == lines[i][:3]: memory_info  = parse_laptop_memory_info(lines[i])
+        elif "저장장치" == lines[i][:4]: storage_info = parse_laptop_storage_info(lines[i])
+        elif "그래픽"   == lines[i][:3]: graphic_card_info = parse_laptop_graphic_card_info(lines[i])
+        elif "네트워크" == lines[i][:4]: network_info      = parse_laptop_network_info(lines[i])
+        elif "영상입출력" == lines[i][:5]: video_io_info   = parse_laptop_video_io_info(lines[i])
+        elif "단자"     == lines[i][:2]: io_port_info      = parse_laptop_io_port_info(lines[i])
+        elif "부가기능" == lines[i][:4]: other_character   = parse_laptop_other_character(lines[i])
+        elif "입력장치" == lines[i][:4]: input_device      = parse_laptop_input_device(lines[i])
+        elif "파워"     == lines[i][:2]: power_info        = parse_laptop_power_info(lines[i])
+
+    for i in range(len(lines)-1, 12, -1):
+        if lines[i] in ["관심상품", "브랜드로그"]:
+            break
+    price             = parse_laptop_price(lines[i+1:])
 
     laptop = {
         "manufacturer": manufacturer,
@@ -298,21 +312,18 @@ def parse_laptop_text(product_text):
     return laptop
 
 
-def get_danawa_laptop_info_selenium(page=1, sort_order="NEW"):
-    driver = laptop_search.get_driver()
+def get_danawa_laptop_info_selenium(page=1):
+    product_list = laptop_search.danawa_laptop_list(page)
 
-    # 신상품순 정렬 페이지 이동
-    driver.get("http://prod.danawa.com/list/?cate=112758&15main_11_02")
-    driver.find_element(By.CSS_SELECTOR, "div.prod_list_opts > div.order_opt > ul > li[data-sort-method=NEW] > a").click()
-
-    time.sleep(2)
-    product_list = driver.find_elements(By.CSS_SELECTOR, "#productListArea > div.main_prodlist.main_prodlist_list > ul > li")
-
-    laptop_info = [parse_laptop_text(product.text) for product in product_list]    
+    laptop_info = []
+    for product in product_list:
+        laptop = parse_laptop_text(product.text)
+        if laptop:
+            laptop_info.append(laptop)
+    laptop_info = laptop_info[:-1]
     return laptop_info
 
 
-laptop_search = LaptopSearch()
-li = get_danawa_laptop_info_selenium()
-for row in li:
-    print(row)
+if __name__=="__main__":
+    parse_laptop_text("")
+    laptop_search.quit_driver()
