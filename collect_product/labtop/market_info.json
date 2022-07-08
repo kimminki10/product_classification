@@ -1,0 +1,18 @@
+{
+    "auction": {
+        "cmpnyc": "EE715",
+        "link_template": "http://itempage3.auction.co.kr/DetailView.aspx?ItemNo=%s"
+    },
+    "11st": {
+        "cmpnyc": "TH201",
+        "link_template": "https://www.11st.co.kr/products/%s"
+    },
+    "gmarket": {
+        "cmpnyc": "EE128",
+        "link_template": "http://item.gmarket.co.kr/DetailView/Item.asp?goodscode=%s"
+    },
+    "g9": {
+        "cmpnyc": "TQB02",
+        "link_template": "https://www.g9.co.kr/Display/VIP/Index/%s"
+    }
+}

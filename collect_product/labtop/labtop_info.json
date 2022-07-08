@@ -1,23 +1,26 @@
 {
     "name": "레노버 LEGION 5 Pro 16ARH R7 3070Ti W11 64GB램",
+    "2in1": "false",
     "OS": "윈도우11홈",
     "purpose": ["게임용", "그래픽작업용"],
     "display": {
         "size": "40.6",
         "resolution": "2560x1600",
-        "color_gamut": {"sRGB":"100"},
+        "color_space": {
+            "color_space_type": "sRGB",
+            "percentage": "100%"
+        },
         "brightness": "500nit",
         "refresh_rate": "165Hz",
         "panel_type": "IPS",
         "other_character": ["광시야각", "눈부심방지", "슬림형 베젤", "돌비비전"]
     },
     "CPU": {
+        "company": "AMD",
         "generation": "라이젠7-5세대",
         "code_name": "램브란트",
-        "name": "6800H",
-        "base_clock": "3.2GHz",
-        "cores": "8",
-        "threads": "16"
+        "cpu_number": "6800H",
+        "core_num": "8"
     },
     "memory": {
         "DDR": "DDR5",
@@ -36,6 +39,7 @@
         "TGP": "150W",
         "VRAM": "8GB"
     },
+    "network": [ "무선랜:802.11ax(Wi-Fi 6)" ],
     "video_IO_port": {
         "info": ["HDMI 2.1", "웹캠(HD)"]
     },
@@ -48,7 +52,8 @@
     "input_device_character": ["RGB 라이트", "ㅗ형 방향키", "숫자 키패드(4열)"],
     "power": {
         "battery_capacity": "80Wh", 
-        "charging_port": "dedicated"
+        "charging_port": "dedicated",
+        "adapter": "45W"
     },
     "specification": {
         "thickness": "19.9mm",

@@ -16,6 +16,9 @@ python3 -m pip install --upgrade pip
 # install requests
 python3 -m pip install --upgrade requests
 
+# install selenium
+python3 -m pip install --upgrade selenium
+
 # install pymongo
 python3 -m pip install --upgrade pymongo
 ```
