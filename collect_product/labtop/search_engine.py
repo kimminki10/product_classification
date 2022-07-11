@@ -57,11 +57,45 @@ class LaptopSearch():
     def notebook_benchmark(self):
         self.driver.get("https://www.notebookcheck.net/Mobile-Graphics-Cards-Benchmark-List.844.0.html?type=&sort=&showClassDescription=1&archive=1&perfrating=1&or=0&showBars=1&3dmark13_ice_gpu=1&3dmark13_cloud_gpu=1&3dmark11_gpu=1&3dmark13_fire_gpu=1&3dmark13_time_spy_gpu=1&gpu_fullname=1&architecture=1&pixelshaders=1&vertexshaders=1&corespeed=1&boostspeed=1&memoryspeed=1&memorybus=1&memorytype=1")
         time.sleep(2)
-        laptop_gpu_list = []
 
         gpu_list = self.driver.find_elements(By.CSS_SELECTOR, "tbody > tr.odd,tr.even")
         laptop_gpu_list = [self.parse_gpu_elem(elem) for elem in gpu_list]
         return laptop_gpu_list
+
+
+    def parse_game_elem(self, element, game_code):
+        benchmark = {}
+        pos = element.find_element(By.CSS_SELECTOR, "span.gg_pos").get_attribute('innerText')
+        name = element.find_element(By.CSS_SELECTOR, "td.specs.fullname").get_attribute('innerText')
+
+        benchmark['GPU'] = {
+            "pos": pos,
+            "name": name,
+            "game_code": game_code
+        }
+
+        game_bench_elems = element.find_elements(By.CSS_SELECTOR, f"td.gg_fld")
+        game_bench = []
+        for elem in game_bench_elems:
+            t = elem.get_attribute('innerText')
+            class_name = elem.get_attribute('class').split(' ')[0]
+            game_bench.append({
+                "value": t,
+                "type": class_name
+            })
+            
+        benchmark['game_bench'] = game_bench
+        return benchmark
+        
+
+    def game_benchmark(self, game_code):
+        url = f"https://www.notebookcheck.net/Computer-Games-on-Laptop-Graphics-Cards.13849.0.html?type=&sort=&professional=2&multiplegpus=1&archive=1&or=0&gpu_fullname=1&gameselect%5B%5D={game_code}"
+        self.driver.get(url)
+        time.sleep(2)
+
+        benchmark_list = self.driver.find_elements(By.CSS_SELECTOR, "tbody > tr.odd,tr.even")
+        laptop_bench_list = [self.parse_game_elem(e, game_code) for e in benchmark_list]
+        return laptop_bench_list
 
     def quit_driver(self):
         self.driver.quit()
@@ -70,6 +104,7 @@ class LaptopSearch():
 laptop_search = LaptopSearch()
 
 if __name__=="__main__":
-    gpu_benchmark_list = laptop_search.notebook_benchmark()
-    print(gpu_benchmark_list)
+    game_benchmark_list = laptop_search.game_benchmark(686)
+    for row in game_benchmark_list:
+        print(row)
     laptop_search.quit_driver()
